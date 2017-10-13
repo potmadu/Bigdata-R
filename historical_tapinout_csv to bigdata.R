@@ -1,3 +1,5 @@
+library(lubridate)
+
 tapin20170921 = read.csv("F:/tapin20170921.csv",stringsAsFactors=FALSE);
 tapin20170927 = read.csv("F:/tapin20170927.csv",stringsAsFactors=FALSE);
 
@@ -19,6 +21,10 @@ tapin20170927$koridor=tapin20170927$koridor2;
 
 tapin20170921$koridor2=NULL;
 tapin20170927$koridor2=NULL;
+
+tapin20170921$tanggal = dmy_hms(tapin20170921$tanggal_jam);
+tapin20170921$jam = hour(tapin20170921$tanggal);
+tapin20170921 %>% group_by(flag,jam) %>% summarize(transaksi=n()) %>% as.data.frame();
 
 write.csv(tapin20170921,"F:/tapin20170921",row.names=FALSE)
 write.csv(tapin20170927,"F:/tapin20170927",row.names=FALSE)

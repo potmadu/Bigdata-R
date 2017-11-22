@@ -117,7 +117,65 @@ where date_id=20170814;"
 
 hadoop fs -getmerge /user/jsc/dump_csv /home/bigsql/bigr/tracking_20170814.csv
 
+#!/bin/bash
+hive -e "drop table if exists csv_dump;
+create table csv_dump ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'
+LOCATION '/user/jsc/dump_csv' as
+select * from sor.waze_jams 
+where date_id>=20170509 and date_id<20170510 and city in ('Jakarta Selatan','Jakarta Utara','Jakarta Pusat','Jakarta Barat','Jakarta Timur');"
 
+hadoop fs -getmerge /user/jsc/dump_csv /home/bigsql/staging/jams_20170509_all.csv
+
+#!/bin/bash
+hive -e "drop table if exists csv_dump;
+create table csv_dump ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'
+LOCATION '/user/jsc/dump_csv' as
+select * from sor.waze_alerts 
+where date_id>=20170509 and date_id<20170510 and city in ('Jakarta Selatan','Jakarta Utara','Jakarta Pusat','Jakarta Barat','Jakarta Timur');"
+
+hadoop fs -getmerge /user/jsc/dump_csv /home/bigsql/staging/alerts_20170509_all.csv
+
+#!/bin/bash
+hive -e "drop table if exists csv_dump;
+create table csv_dump ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'
+LOCATION '/user/jsc/dump_csv' as
+select * from sor.ambulance
+where date_id>=20171026;"
+
+hadoop fs -getmerge /user/jsc/dump_csv /home/bigsql/staging/ambulance_20171026.csv
+
+#!/bin/bash
+hive -e "drop table if exists csv_dump;
+create table csv_dump ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'
+LOCATION '/user/jsc/dump_csv' as
+select * from sor.waze_alerts
+where date_id>=20171023 and city in ('Jakarta Selatan','Jakarta Utara','Jakarta Pusat','Jakarta Barat','Jakarta Timur');"
+
+hadoop fs -getmerge /user/jsc/dump_csv /home/bigsql/staging/alerts_20171023.csv
+
+#!/bin/bash
+hive -e "drop table if exists csv_dump;
+create table csv_dump ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'
+LOCATION '/user/jsc/dump_csv' as
+select * from sor.waze_alerts
+where date_id>=20171001 and city in ('Jakarta Pusat');"
+
+hadoop fs -getmerge /user/jsc/dump_csv /home/bigsql/staging/alerts_20171001_jakpus.csv
+
+#!/bin/bash
+hive -e "drop table if exists csv_dump;
+create table csv_dump ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'
+LOCATION '/user/jsc/dump_csv' as
+select distinct street,roadtype,city,line_x,line_y,delay,pubmillis from (select distinct street,roadtype,city,line_x,line_y,delay,pubmillis from sor.waze_jams 
+where date_id>=20171001 and city in ('Jakarta Pusat')) t1;"
+
+hadoop fs -getmerge /user/jsc/dump_csv /home/bigsql/staging/jams_20171001_jakpus.csv
 
 #########################
 ### HDFS COPY TO LOCAL

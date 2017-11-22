@@ -1,0 +1,8 @@
+PPN_DTTM_SOURCE=20171122
+PPN_DTTM_DEST=20171115
+DATE_ID=20171111
+hadoop fs -mkdir /apps/hive/warehouse/sor.db/transj_tapinout/ppn_dttm=${PPN_DTTM_DEST};
+hadoop fs -chmod 777 /apps/hive/warehouse/sor.db/transj_tapinout/ppn_dttm=${PPN_DTTM_DEST};
+hive -e "alter table SOR.TRANSJ_TAPINOUT DROP IF EXISTS PARTITION (date_id = '${DATE_ID}', ppn_dttm='${PPN_DTTM_DEST}');"
+hive -e "alter table SOR.TRANSJ_TAPINOUT add partition (date_id = '${DATE_ID}', ppn_dttm='${PPN_DTTM_DEST}') location '/apps/hive/warehouse/sor.db/transj_tapinout/ppn_dttm=${PPN_DTTM_DEST}';"
+hive -e "INSERT OVERWRITE TABLE SOR.TRANSJ_TAPINOUT PARTITION (date_id = ${DATE_ID}, ppn_dttm = ${PPN_DTTM_DEST}) select from_unixtime(unix_timestamp(TRANSJ_TAPINOUT_API.TANGGAL_JAM,'dd-MM-yyyy hh:mm:ss'),'dd-MM-yyyy') as TANGGAL_TRANSAKSI, from_unixtime(unix_timestamp(TRANSJ_TAPINOUT_API.TANGGAL_JAM,'dd-MM-yyyy hh:mm:ss'),'hh:mm:ss') as JAM_TRANSAKSI, TRANSJ_TAPINOUT_API.TANGGAL_JAM as TANGGAL_JAM_TRANSAKSI, TRANSJ_TAPINOUT_API.TANGGAL_JAM as TANGGAL_MASUK, PAN as NO_PAN, KARTU, KORIDOR, SUBKORIDOR as SUB_KORIDOR, HALTE, FLAG as FLAG_INOUT FROM sor.TRANSJ_TAPINOUT_API where DATE_ID = ${DATE_ID} AND PPN_DTTM = ${PPN_DTTM_SOURCE};"
